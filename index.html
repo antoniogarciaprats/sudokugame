@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .sudoku-container {
+            display: grid;
+            grid-template-columns: repeat(9, 40px);
+            grid-template-rows: repeat(9, 40px);
+            gap: 2px;
+            margin: 20px 0;
+        }
+
+        .sudoku-cell {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            border: 1px solid #ccc;
+        }
+
+        .sudoku-cell input {
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            border: none;
+            font-size: 18px;
+        }
+
+        .sudoku-cell.fixed input {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .sudoku-cell input:focus {
+            outline: 2px solid #4caf50;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4caf50;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>Sudoku Game</h1>
+    <div class="sudoku-container" id="sudoku-board">
+        <!-- Sudoku cells will be generated dynamically -->
+    </div>
+    <div class="controls">
+        <button id="check-sudoku">Check Solution</button>
+        <button id="reset-sudoku">Reset</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const sudokuBoard = [
+            [5, 3, 0, 0, 7, 0, 0, 0, 0],
+            [6, 0, 0, 1, 9, 5, 0, 0, 0],
+            [0, 9, 8, 0, 0, 0, 0, 6, 0],
+            [8, 0, 0, 0, 6, 0, 0, 0, 3],
+            [4, 0, 0, 8, 0, 3, 0, 0, 1],
+            [7, 0, 0, 0, 2, 0, 0, 0, 6],
+            [0, 6, 0, 0, 0, 0, 2, 8, 0],
+            [0, 0, 0, 4, 1, 9, 0, 0, 5],
+            [0, 0, 0, 0, 8, 0, 0, 7, 9],
+        ];
+
+        const solutionBoard = [
+            [5, 3, 4, 6, 7, 8, 9, 1, 2],
+            [6, 7, 2, 1, 9, 5, 3, 4, 8],
+            [1, 9, 8, 3, 4, 2, 5, 6, 7],
+            [8, 5, 9, 7, 6, 1, 4, 2, 3],
+            [4, 2, 6, 8, 5, 3, 7, 9, 1],
+            [7, 1, 3, 9, 2, 4, 8, 5, 6],
+            [9, 6, 1, 5, 3, 7, 2, 8, 4],
+            [2, 8, 7, 4, 1, 9, 6, 3, 5],
+            [3, 4, 5, 2, 8, 6, 1, 7, 9],
+        ];
+
+        function createBoard() {
+            const board = $('#sudoku-board');
+            board.empty();
+            for (let i = 0; i < 9; i++) {
+                for (let j = 0; j < 9; j++) {
+                    const cellValue = sudokuBoard[i][j];
+                    const cell = $('<div class="sudoku-cell"></div>');
+                    if (cellValue !== 0) {
+                        cell.addClass('fixed');
+                        cell.append(`<input type="text" value="${cellValue}" disabled>`);
+                    } else {
+                        cell.append('<input type="text" maxlength="1">');
+                    }
+                    board.append(cell);
+                }
+            }
+        }
+
+        function checkSolution() {
+            let isCorrect = true;
+            $('.sudoku-cell input').each(function (index) {
+                const row = Math.floor(index / 9);
+                const col = index % 9;
+                const userValue = parseInt($(this).val()) || 0;
+                if (userValue !== solutionBoard[row][col]) {
+                    isCorrect = false;
+                    $(this).css('background-color', '#ffcccc');
+                } else {
+                    $(this).css('background-color', '#ccffcc');
+                }
+            });
+
+            if (isCorrect) {
+                alert('Congratulations! You solved the Sudoku.');
+            } else {
+                alert('Some cells are incorrect. Keep trying!');
+            }
+        }
+
+        function resetBoard() {
+            $('.sudoku-cell input').each(function (index) {
+                const row = Math.floor(index / 9);
+                const col = index % 9;
+                if (sudokuBoard[row][col] === 0) {
+                    $(this).val('').css('background-color', '');
+                } else {
+                    $(this).css('background-color', '');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            createBoard();
+
+            $('#check-sudoku').on('click', function () {
+                checkSolution();
+            });
+
+            $('#reset-sudoku').on('click', function () {
+                resetBoard();
+            });
+        });
+    </script>
+</body>
+</html>
